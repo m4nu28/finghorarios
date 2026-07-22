@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import useUrlState from './hooks/useUrlState'
 import HorariosModule from './modules/HorariosModule'
 import ConsultaDeAvance from './modules/ConsultaDeAvance'
 
@@ -15,15 +16,8 @@ const TABS = [
   )},
 ]
 
-function safeSetStored(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)) } catch {}
-}
-
 export default function App() {
-  const [activeTab, setActiveTab] = useState(() => {
-    try { return localStorage.getItem('finghorarios_tab') || 'horarios' } catch { return 'horarios' }
-  })
-  const [selectedCarrera, setSelectedCarrera] = useState(null)
+  const [activeTab, setActiveTab] = useUrlState('tab', 'horarios')
   const [dark, setDark] = useState(() => {
     const stored = localStorage.getItem('finghorarios_dark')
     if (stored !== null) return stored === 'true'
@@ -33,12 +27,8 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
-    safeSetStored('finghorarios_dark', dark)
+    try { localStorage.setItem('finghorarios_dark', dark) } catch {}
   }, [dark])
-
-  useEffect(() => {
-    try { localStorage.setItem('finghorarios_tab', activeTab) } catch {}
-  }, [activeTab])
 
   useEffect(() => {
     fetch('/api/courses/?limit=1')
@@ -47,24 +37,19 @@ export default function App() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 transition-colors duration-300">
-      <header className="sticky top-0 z-40 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl border-b border-neutral-200/60 dark:border-neutral-800/60">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-accent-600 flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h1 className="text-sm font-semibold text-neutral-900 dark:text-white tracking-tight">FING</h1>
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 transition-colors duration-200">
+      <header className="sticky top-0 z-40 bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-sm font-semibold text-neutral-900 dark:text-white tracking-tight">FING Horarios</h1>
           </div>
 
-          <nav className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800/60 p-1 rounded-xl">
+          <nav className="flex items-center gap-0.5 bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded-lg">
             {TABS.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-100 ${
                   activeTab === tab.id
                     ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
                     : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
@@ -78,8 +63,8 @@ export default function App() {
 
           <button
             onClick={() => setDark(d => !d)}
-            className="btn-ghost p-2 rounded-xl"
-            title={dark ? 'Modo claro' : 'Modo oscuro'}
+            className="btn-ghost p-1.5 rounded-lg"
+            aria-label={dark ? 'Modo claro' : 'Modo oscuro'}
           >
             {dark ? (
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -94,11 +79,9 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
         {activeTab === 'horarios' && <HorariosModule loadError={loadError} />}
-        {activeTab === 'avance' && (
-          <ConsultaDeAvance selectedCarrera={selectedCarrera} onSelectCarrera={setSelectedCarrera} />
-        )}
+        {activeTab === 'avance' && <ConsultaDeAvance />}
       </main>
     </div>
   )

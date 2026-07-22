@@ -31,19 +31,11 @@
    ========================================= */
 
 .card {
-  @apply bg-white rounded-3xl border border-neutral-200/80 p-6 transition-all duration-200;
+  @apply bg-white rounded-xl border border-neutral-200/80 p-5 transition-colors duration-150;
 }
 
 .dark .card {
   @apply bg-neutral-900 border-neutral-800/80;
-}
-
-.card-interactive {
-  @apply card cursor-pointer hover:shadow-card-hover hover:border-neutral-300;
-}
-
-.dark .card-interactive {
-  @apply hover:border-neutral-700;
 }
 
 /* =========================================
@@ -51,21 +43,19 @@
    ========================================= */
 
 .btn-primary {
-  @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-150;
-  box-shadow: 0 1px 2px 0 rgb(99 102 241 / 0.3), inset 0 1px 0 0 rgb(255 255 255 / 0.1);
+  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-150;
 }
 
 .btn-primary:hover {
   @apply bg-accent-700;
-  box-shadow: 0 4px 12px -2px rgb(99 102 241 / 0.4), inset 0 1px 0 0 rgb(255 255 255 / 0.1);
 }
 
 .btn-primary:active {
-  @apply bg-accent-800 scale-[0.98];
+  @apply bg-accent-800;
 }
 
 .btn-secondary {
-  @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-all duration-150;
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors duration-150;
 }
 
 .dark .btn-secondary {
@@ -81,7 +71,7 @@
 }
 
 .btn-secondary:active {
-  @apply scale-[0.98];
+  @apply bg-neutral-100;
 }
 
 .btn-ghost {
@@ -105,7 +95,7 @@
    ========================================= */
 
 .input {
-  @apply w-full rounded-2xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 transition-all duration-150 outline-none;
+  @apply w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 transition-colors duration-150 outline-none;
 }
 
 .input:focus {
@@ -133,7 +123,7 @@
 }
 
 .pill:active {
-  @apply scale-[0.97];
+  @apply bg-neutral-100;
 }
 
 .pill-active {
@@ -174,31 +164,37 @@
 }
 
 /* =========================================
-   Animations
+   Reduced Motion
    ========================================= */
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-.animate-slide-down {
-  animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* =========================================
+   Focus Visible
+   ========================================= */
+
+:focus-visible {
+  @apply outline-none ring-2 ring-accent-400 ring-offset-2 ring-offset-white;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.dark :focus-visible {
+  @apply ring-accent-500 ring-offset-neutral-950;
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
+button:focus-visible,
+a:focus-visible {
+  @apply outline-none ring-2 ring-accent-400 ring-offset-2;
+}
+
+.dark button:focus-visible,
+.dark a:focus-visible {
+  @apply ring-accent-500 ring-offset-neutral-950;
 }
 
 /* =========================================

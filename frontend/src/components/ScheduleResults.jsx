@@ -25,19 +25,19 @@ export default function ScheduleResults({ results, onSelect, selectedIdx }) {
 
   return (
     <div className="card">
-      <div className="flex items-center justify-between mb-4">
-        <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Horarios generados</label>
-        <span className="text-[11px] font-medium text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-lg">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Horarios generados</span>
+        <span className="text-[11px] font-medium text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-md">
           {results.length} {results.length === 1 ? 'opción' : 'opciones'}
         </span>
       </div>
 
-      <div className="flex gap-1 mb-5 bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded-xl">
+      <div className="flex gap-1 mb-4 bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded-lg">
         {SORT_OPTIONS.map(opt => (
           <button
             key={opt.key}
             onClick={() => setSortBy(opt.key)}
-            className={`flex-1 text-[11px] font-medium py-1.5 rounded-lg transition-all duration-150 ${
+            className={`flex-1 text-[11px] font-medium py-1.5 rounded-md transition-colors duration-100 ${
               sortBy === opt.key
                 ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-200 shadow-sm'
                 : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
@@ -48,7 +48,7 @@ export default function ScheduleResults({ results, onSelect, selectedIdx }) {
         ))}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {visible.map((result, i) => (
           <ScheduleCard
             key={i}
@@ -61,7 +61,7 @@ export default function ScheduleResults({ results, onSelect, selectedIdx }) {
       </div>
 
       {sorted.length > 8 && !showAll && (
-        <button onClick={() => setShowAll(true)} className="btn-ghost w-full mt-4 text-xs">
+        <button onClick={() => setShowAll(true)} className="btn-ghost w-full mt-3 text-xs">
           Ver {sorted.length - 8} opciones más
         </button>
       )}

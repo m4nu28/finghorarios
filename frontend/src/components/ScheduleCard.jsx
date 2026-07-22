@@ -26,28 +26,28 @@ export default function ScheduleCard({ result, index, onSelect, isSelected }) {
   return (
     <button
       onClick={onSelect}
-      className={`w-full text-left p-4 rounded-2xl border transition-all duration-150 ${
+      className={`w-full text-left p-3.5 rounded-xl border transition-colors duration-100 ${
         isSelected
           ? 'bg-accent-50/50 dark:bg-accent-950/10 border-accent-200 dark:border-accent-800/60'
           : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700'
       }`}
     >
-      <div className="flex items-center justify-between mb-2.5">
-        <div className="flex items-center gap-2.5">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
           <span className="text-[11px] font-mono font-semibold text-neutral-300 dark:text-neutral-600">#{index + 1}</span>
-          <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-lg ${label.color}`}>{label.text}</span>
+          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${label.color}`}>{label.text}</span>
         </div>
         <span className="text-sm font-bold text-neutral-900 dark:text-white">{result.score}</span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-neutral-500 mb-2.5">
-        <span className="flex items-center gap-1.5">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-neutral-500 mb-2">
+        <span className="flex items-center gap-1">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
           </svg>
           {dayCount} día{dayCount !== 1 ? 's' : ''}
         </span>
-        <span className="flex items-center gap-1.5">
+        <span className="flex items-center gap-1">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -58,7 +58,7 @@ export default function ScheduleCard({ result, index, onSelect, isSelected }) {
       {dayCounts.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {dayCounts.map(({ day, minutes }) => (
-            <span key={day} className="text-[10px] font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-500 rounded-lg px-2 py-0.5">
+            <span key={day} className="text-[10px] font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-500 rounded-md px-2 py-0.5">
               {day} {minutes}m
             </span>
           ))}

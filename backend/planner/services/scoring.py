@@ -156,19 +156,19 @@ def _calculate_gaps(meetings, active_days, busy_blocks):
 def _subtract_busy(gap_start, gap_end, day_blocks):
     total_busy = 0
     for block in day_blocks:
-        b_start = max_time(gap_start, block["start"])
-        b_end = min_time(gap_end, block["end"])
+        b_start = _max_time(gap_start, block["start"])
+        b_end = _min_time(gap_end, block["end"])
         overlap = _time_diff_minutes(b_start, b_end)
         if overlap > 0:
             total_busy += overlap
     return min(total_busy, _time_diff_minutes(gap_start, gap_end))
 
 
-def max_time(t1, t2):
+def _max_time(t1, t2):
     return t1 if (t1.hour * 60 + t1.minute) >= (t2.hour * 60 + t2.minute) else t2
 
 
-def min_time(t1, t2):
+def _min_time(t1, t2):
     return t1 if (t1.hour * 60 + t1.minute) <= (t2.hour * 60 + t2.minute) else t2
 
 

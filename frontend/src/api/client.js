@@ -4,16 +4,16 @@ async function request(url, options = {}) {
   const res = await fetch(url, options)
   const body = await res.json().catch(() => null)
   if (!res.ok) {
-    if (body?.error) throw new Error(body.error)
-    if (body?.detail) throw new Error(body.detail)
-    if (typeof body === 'object') {
-      const msgs = Object.entries(body)
-        .flatMap(([k, v]) => (Array.isArray(v) ? v.map(e => `${k}: ${e}`) : [`${k}: ${v}`]))
-      if (msgs.length) throw new Error(msgs.join('. '))
+    if (body?.error) {
+      const err = new Error(body.error.message || 'Error del servidor.')
+      err.code = body.error.code
+      err.fields = body.error.fields
+      throw err
     }
+    if (body?.detail) throw new Error(body.detail)
     throw new Error('Error del servidor. Intentá de nuevo.')
   }
-  return body
+  return body?.data !== undefined ? body.data : body
 }
 
 export async function searchCourses(query) {
@@ -24,7 +24,7 @@ export async function searchCourses(query) {
 }
 
 export async function generateSchedule({ course_codes, busy_blocks, preferences, course_types }) {
-  return request(`${API_BASE}/planner/generate/`, {
+  return request(`${API_BASE}/schedules/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ course_codes, busy_blocks, preferences, course_types }),

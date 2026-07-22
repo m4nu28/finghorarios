@@ -25,12 +25,14 @@ def combination_has_conflict(combination_meetings):
 
 
 def busy_blocks_conflict(meetings, busy_blocks):
+    parsed_blocks = [
+        {"day": b["day"], "start": _parse_time(b["start"]), "end": _parse_time(b["end"])}
+        for b in busy_blocks
+    ]
     for meeting in meetings:
-        for block in busy_blocks:
+        for block in parsed_blocks:
             if meeting["day"] == block["day"]:
-                block_start = _parse_time(block["start"])
-                block_end = _parse_time(block["end"])
-                if times_overlap(meeting["start"], meeting["end"], block_start, block_end):
+                if times_overlap(meeting["start"], meeting["end"], block["start"], block["end"]):
                     return True
     return False
 

@@ -5,5 +5,5 @@ from .views import GenerateScheduleView
 app_name = "planner"
 
 urlpatterns = [
-    path("generate/", GenerateScheduleView.as_view(), name="generate"),
+    path("", GenerateScheduleView.as_view(), name="generate"),
 ]

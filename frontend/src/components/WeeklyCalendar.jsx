@@ -69,13 +69,13 @@ export default function WeeklyCalendar({ solution, busyBlocks, courseNameMap }) 
 
   return (
     <div className="card">
-      <label className="block text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-4">Calendario</label>
+      <span className="block text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-3">Calendario</span>
 
-      <div className="overflow-x-auto -mx-6 px-6">
+      <div className="overflow-x-auto -mx-5 px-5">
         <div className="min-w-[480px]">
-          <div className="flex border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden">
+          <div className="flex border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden">
             <div className="w-12 flex-shrink-0">
-              <div className="h-10 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900" />
+              <div className="h-9 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900" />
               {hours.map(h => (
                 <div key={h} className="border-b border-neutral-100 dark:border-neutral-800/50 bg-white dark:bg-neutral-900" style={{ height: HOUR_HEIGHT }}>
                   <span className="block text-[10px] text-neutral-400 text-right pr-2 pt-1 font-medium">{h}:00</span>
@@ -85,7 +85,7 @@ export default function WeeklyCalendar({ solution, busyBlocks, courseNameMap }) 
 
             {DAY_NAMES.map((dayName, dayIndex) => (
               <div key={dayIndex} className="flex-1 border-l border-neutral-200 dark:border-neutral-800 relative">
-                <div className="h-10 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center">
+                <div className="h-9 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center">
                   <span className="text-[11px] font-medium text-neutral-500">{dayName}</span>
                 </div>
                 <div className="relative" style={{ height: TOTAL_HOURS * HOUR_HEIGHT }}>
@@ -100,7 +100,7 @@ export default function WeeklyCalendar({ solution, busyBlocks, courseNameMap }) 
                     return (
                       <div
                         key={`block-${i}`}
-                        className={`absolute left-1 right-1 rounded-xl flex items-center justify-center z-10 ${
+                        className={`absolute left-1 right-1 rounded-lg flex items-center justify-center z-10 ${
                           isFixed
                             ? 'bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700'
                             : 'bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 border-dashed'
@@ -125,7 +125,7 @@ export default function WeeklyCalendar({ solution, busyBlocks, courseNameMap }) 
                     return (
                       <div
                         key={`m-${i}`}
-                        className={`absolute left-0.5 right-0.5 ${color.bg} ${dColor.bg} border ${color.border} ${dColor.border} rounded-xl px-2 py-1 overflow-hidden z-20 cursor-default hover:shadow-card-hover transition-shadow duration-150`}
+                        className={`absolute left-0.5 right-0.5 ${color.bg} ${dColor.bg} border ${color.border} ${dColor.border} rounded-lg px-2 py-1 overflow-hidden z-20 cursor-default`}
                         style={{ top, height, minHeight: 24 }}
                       >
                         <div className={`text-[10px] font-semibold ${color.text} ${dColor.text} leading-tight truncate`}>
@@ -151,7 +151,7 @@ export default function WeeklyCalendar({ solution, busyBlocks, courseNameMap }) 
       </div>
 
       {courseCodes.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-4">
+        <div className="mt-3 flex flex-wrap gap-3">
           {courseCodes.map(code => {
             const color = colorMap[code]?.light || COLORS[0]
             const dColor = colorMap[code]?.dark || DARK_COLORS[0]
@@ -168,12 +168,7 @@ export default function WeeklyCalendar({ solution, busyBlocks, courseNameMap }) 
       )}
 
       {meetings.length === 0 && (
-        <div className="text-center py-20">
-          <div className="w-12 h-12 bg-neutral-100 dark:bg-neutral-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-neutral-300 dark:text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-            </svg>
-          </div>
+        <div className="text-center py-16">
           <p className="text-sm text-neutral-400">Seleccioná una opción para ver el calendario</p>
         </div>
       )}

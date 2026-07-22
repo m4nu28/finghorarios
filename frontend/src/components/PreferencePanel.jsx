@@ -8,11 +8,11 @@ export default function PreferencePanel({ preferences, onChange }) {
   }
 
   return (
-    <div className="card">
-      <label className="block text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-4">Preferencias</label>
+    <div>
+      <span className="block text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-3">Preferencias</span>
 
-      <div className="mb-5">
-        <label className="block text-[11px] font-medium text-neutral-400 mb-2">Horarios preferidos</label>
+      <div className="mb-4">
+        <label className="block text-[11px] font-medium text-neutral-400 mb-1.5">Horarios preferidos</label>
         <div className="flex flex-wrap gap-1">
           {[
             { value: 'morning', label: 'Mañana' },
@@ -26,8 +26,8 @@ export default function PreferencePanel({ preferences, onChange }) {
         </div>
       </div>
 
-      <div className="mb-5">
-        <label className="block text-[11px] font-medium text-neutral-400 mb-2">Horarios a evitar</label>
+      <div className="mb-4">
+        <label className="block text-[11px] font-medium text-neutral-400 mb-1.5">Horarios a evitar</label>
         <div className="flex flex-wrap gap-1">
           <button onClick={() => update('avoid_friday', !preferences.avoid_friday)} className={`pill ${preferences.avoid_friday ? 'pill-active' : ''}`}>
             Viernes
@@ -39,7 +39,7 @@ export default function PreferencePanel({ preferences, onChange }) {
       </div>
 
       <div>
-        <label className="block text-[11px] font-medium text-neutral-400 mb-2">Máximo de días</label>
+        <label className="block text-[11px] font-medium text-neutral-400 mb-1.5">Máximo de días</label>
         <div className="flex gap-1">
           {[3, 4, 5].map(n => (
             <button key={n} onClick={() => update('max_days', preferences.max_days === n ? null : n)} className={`pill flex-1 text-center ${preferences.max_days === n ? 'pill-active' : ''}`}>

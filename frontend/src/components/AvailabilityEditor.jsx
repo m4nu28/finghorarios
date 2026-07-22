@@ -27,11 +27,11 @@ export default function AvailabilityEditor({ busyBlocks, onChange }) {
   }
 
   return (
-    <div className="card">
-      <label className="block text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1">Horarios ocupados</label>
-      <p className="text-xs text-neutral-400 dark:text-neutral-500 mb-4">Horarios en los que no podés cursar</p>
+    <div>
+      <span className="block text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1">Horarios ocupados</span>
+      <p className="text-xs text-neutral-400 dark:text-neutral-500 mb-3">Horarios en los que no podés cursar</p>
 
-      <div className="flex gap-1 mb-4 bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded-xl">
+      <div className="flex gap-1 mb-3 bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded-lg">
         {[
           { key: 'single', label: 'Día individual' },
           { key: 'range', label: 'Rango de días' },
@@ -39,7 +39,7 @@ export default function AvailabilityEditor({ busyBlocks, onChange }) {
           <button
             key={opt.key}
             onClick={() => setMode(opt.key)}
-            className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition-all duration-150 ${
+            className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-colors duration-100 ${
               mode === opt.key
                 ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-200 shadow-sm'
                 : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
@@ -51,8 +51,8 @@ export default function AvailabilityEditor({ busyBlocks, onChange }) {
       </div>
 
       {mode === 'range' && (
-        <div className="mb-3 animate-slide-down">
-          <label className="block text-[11px] font-medium text-neutral-400 mb-1.5">Días</label>
+        <div className="mb-2.5">
+          <label className="block text-[11px] font-medium text-neutral-400 mb-1">Días</label>
           <div className="flex gap-1">
             {[
               { label: 'Lun–Vie', days: [0,1,2,3,4] },
@@ -68,8 +68,8 @@ export default function AvailabilityEditor({ busyBlocks, onChange }) {
       )}
 
       {mode === 'single' && (
-        <div className="mb-3">
-          <label className="block text-[11px] font-medium text-neutral-400 mb-1.5">Día</label>
+        <div className="mb-2.5">
+          <label className="block text-[11px] font-medium text-neutral-400 mb-1">Día</label>
           <div className="flex gap-1">
             {DAY_NAMES.map((name, i) => (
               <button key={i} onClick={() => setDay(i)} className={`pill flex-1 text-center py-1.5 ${day === i ? 'pill-active' : ''}`}>
@@ -80,7 +80,7 @@ export default function AvailabilityEditor({ busyBlocks, onChange }) {
         </div>
       )}
 
-      <div className="flex flex-wrap items-end gap-2 mb-4">
+      <div className="flex flex-wrap items-end gap-2 mb-3">
         <div>
           <label className="block text-[11px] font-medium text-neutral-400 mb-1">Desde</label>
           <input type="time" value={start} onChange={(e) => setStart(e.target.value)} className="input w-28 text-xs" />
@@ -99,13 +99,13 @@ export default function AvailabilityEditor({ busyBlocks, onChange }) {
       </div>
 
       {busyBlocks.length > 0 && (
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {busyBlocks.map((block, i) => (
-            <div key={i} className="flex items-center justify-between rounded-xl px-3 py-2.5 group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
-              <div className="flex items-center gap-2.5 min-w-0">
+            <div key={i} className="flex items-center justify-between rounded-lg px-3 py-2 group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
+              <div className="flex items-center gap-2 min-w-0">
                 <div className="w-1.5 h-1.5 rounded-full bg-neutral-300 dark:bg-neutral-600 flex-shrink-0" />
                 <div className="min-w-0">
-                  <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{DAY_NAMES[block.day] || `Día ${block.day}`}</span>
+                  <span className="text-sm text-neutral-700 dark:text-neutral-300">{DAY_NAMES[block.day] || `Día ${block.day}`}</span>
                   <span className="text-neutral-300 dark:text-neutral-600 mx-1.5">·</span>
                   <span className="text-sm text-neutral-500">{block.start} – {block.end}</span>
                   {block.reason && (
@@ -116,7 +116,7 @@ export default function AvailabilityEditor({ busyBlocks, onChange }) {
                   )}
                 </div>
               </div>
-              <button onClick={() => onChange(busyBlocks.filter((_, idx) => idx !== i))} className="opacity-0 group-hover:opacity-100 text-neutral-300 hover:text-red-500 transition-all ml-2 flex-shrink-0">
+              <button onClick={() => onChange(busyBlocks.filter((_, idx) => idx !== i))} aria-label="Quitar bloque" className="opacity-0 group-hover:opacity-100 text-neutral-300 hover:text-red-500 transition-all ml-2 flex-shrink-0 p-1 min-h-[28px] min-w-[28px] flex items-center justify-center">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>

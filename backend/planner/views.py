@@ -28,7 +28,13 @@ class GenerateScheduleView(APIView):
 
         if missing:
             return Response(
-                {"error": f"Materias no encontradas: {', '.join(missing)}"},
+                {
+                    "error": {
+                        "code": "missing_courses",
+                        "message": f"Materias no encontradas: {', '.join(missing)}",
+                        "fields": {"course_codes": missing},
+                    }
+                },
                 status=400,
             )
 
@@ -56,12 +62,18 @@ class GenerateScheduleView(APIView):
 
         if not any(c["groups"] for c in courses_data):
             return Response(
-                {"error": "Las materias seleccionadas no tienen grupos disponibles."},
+                {
+                    "error": {
+                        "code": "no_groups",
+                        "message": "Las materias seleccionadas no tienen grupos disponibles.",
+                        "fields": {},
+                    }
+                },
                 status=400,
             )
 
         result = generate(courses_data, busy_blocks, preferences, course_types)
-        return Response(result)
+        return Response({"data": result})
 
 
 def _parse_busy_blocks(blocks):
