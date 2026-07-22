@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import useUrlState from './hooks/useUrlState'
+import LandingPage from './modules/LandingPage'
 import HorariosModule from './modules/HorariosModule'
 import ConsultaDeAvance from './modules/ConsultaDeAvance'
 
@@ -16,8 +17,10 @@ const TABS = [
   )},
 ]
 
+const isLanding = (tab) => tab === 'landing' || tab === null
+
 export default function App() {
-  const [activeTab, setActiveTab] = useUrlState('tab', 'horarios')
+  const [activeTab, setActiveTab] = useUrlState('tab', 'landing')
   const [dark, setDark] = useState(() => {
     const stored = localStorage.getItem('finghorarios_dark')
     if (stored !== null) return stored === 'true'
@@ -36,30 +39,37 @@ export default function App() {
       .catch(() => setLoadError('No se pudo conectar con el servidor. Verificá que esté corriendo.'))
   }, [])
 
+  const onLanding = isLanding(activeTab)
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 transition-colors duration-200">
       <header className="sticky top-0 z-40 bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-sm font-semibold text-neutral-900 dark:text-white tracking-tight">FING Horarios</h1>
-          </div>
+          <button
+            onClick={() => setActiveTab('landing')}
+            className="flex items-center gap-2.5 group"
+          >
+            <h1 className="text-sm font-semibold text-neutral-900 dark:text-white tracking-tight group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">FING Horarios</h1>
+          </button>
 
-          <nav className="flex items-center gap-0.5 bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded-lg">
-            {TABS.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-100 ${
-                  activeTab === tab.id
-                    ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
-                    : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
-                }`}
-              >
-                {tab.icon}
-                <span className="hidden sm:inline">{tab.label}</span>
-              </button>
-            ))}
-          </nav>
+          {!onLanding && (
+            <nav className="flex items-center gap-0.5 bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded-lg">
+              {TABS.map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-100 ${
+                    activeTab === tab.id
+                      ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
+                      : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+                  }`}
+                >
+                  {tab.icon}
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+          )}
 
           <button
             onClick={() => setDark(d => !d)}
@@ -79,7 +89,8 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-6">
+      <main className={`${onLanding ? '' : 'max-w-7xl mx-auto px-6 lg:px-8 py-6'}`}>
+        {onLanding && <LandingPage onNavigate={setActiveTab} />}
         {activeTab === 'horarios' && <HorariosModule loadError={loadError} />}
         {activeTab === 'avance' && <ConsultaDeAvance />}
       </main>
