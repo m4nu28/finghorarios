@@ -43,13 +43,21 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 transition-colors duration-200">
-      <header className="sticky top-0 z-40 bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800">
+      <header className={`top-0 z-40 transition-colors duration-200 ${
+        onLanding
+          ? 'fixed inset-x-0 bg-[#07111f]/35 border-b border-white/10 backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.06)]'
+          : 'sticky bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800'
+      }`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 h-14 flex items-center justify-between">
           <button
             onClick={() => setActiveTab('landing')}
             className="flex items-center gap-2.5 group"
           >
-            <h1 className="text-sm font-semibold text-neutral-900 dark:text-white tracking-tight group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">FING Horarios</h1>
+            <h1 className={`text-sm font-semibold tracking-tight transition-colors ${
+              onLanding
+                ? 'text-white group-hover:text-accent-300'
+                : 'text-neutral-900 dark:text-white group-hover:text-accent-600 dark:group-hover:text-accent-400'
+            }`}>FING Horarios</h1>
           </button>
 
           {!onLanding && (
@@ -73,7 +81,7 @@ export default function App() {
 
           <button
             onClick={() => setDark(d => !d)}
-            className="btn-ghost p-1.5 rounded-lg"
+            className={`btn-ghost p-1.5 rounded-lg ${onLanding ? 'text-white/70 hover:text-white hover:bg-white/10' : ''}`}
             aria-label={dark ? 'Modo claro' : 'Modo oscuro'}
           >
             {dark ? (
