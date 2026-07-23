@@ -24,6 +24,10 @@ export async function searchCourses(query) {
   return request(url)
 }
 
+export async function checkApiConnection() {
+  return request(`${API_BASE}/courses/?limit=1`)
+}
+
 export async function generateSchedule({ course_codes, busy_blocks, preferences, course_types }) {
   return request(`${API_BASE}/schedules/`, {
     method: 'POST',

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import useUrlState from './hooks/useUrlState'
+import { checkApiConnection } from './api/client'
 import LandingPage from './modules/LandingPage'
 import HorariosModule from './modules/HorariosModule'
 import ConsultaDeAvance from './modules/ConsultaDeAvance'
@@ -34,8 +35,8 @@ export default function App() {
   }, [dark])
 
   useEffect(() => {
-    fetch('/api/courses/?limit=1')
-      .then(r => { if (!r.ok) throw new Error() })
+    checkApiConnection()
+      .then(() => setLoadError(null))
       .catch(() => setLoadError('No se pudo conectar con el servidor. Verificá que esté corriendo.'))
   }, [])
 
