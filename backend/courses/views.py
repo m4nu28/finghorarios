@@ -2,8 +2,19 @@ from django.db import models
 from rest_framework import generics
 from rest_framework.response import Response
 
-from .models import Course
+from .models import Course, Semester
 from .serializers import CourseDetailSerializer, CourseListSerializer
+
+
+def get_requested_semester(request):
+    year = request.query_params.get("year")
+    period = request.query_params.get("period")
+    queryset = Semester.objects.all()
+    if year:
+        queryset = queryset.filter(year=year)
+    if period:
+        queryset = queryset.filter(period=period)
+    return queryset.first()
 
 
 class CourseListView(generics.ListAPIView):
@@ -12,6 +23,9 @@ class CourseListView(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = Course.objects.prefetch_related("groups")
+        semester = get_requested_semester(self.request)
+        if semester:
+            queryset = queryset.filter(semester=semester)
         search = self.request.query_params.get("search")
         if search:
             queryset = queryset.filter(
@@ -26,6 +40,12 @@ class CourseListView(generics.ListAPIView):
 
 
 class CourseDetailView(generics.RetrieveAPIView):
-    queryset = Course.objects.prefetch_related("groups__meetings")
     serializer_class = CourseDetailSerializer
     lookup_field = "code"
+
+    def get_queryset(self):
+        queryset = Course.objects.prefetch_related("groups__meetings")
+        semester = get_requested_semester(self.request)
+        if semester:
+            queryset = queryset.filter(semester=semester)
+        return queryset

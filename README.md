@@ -24,7 +24,7 @@ pip install -r requirements.txt
 python3 manage.py migrate
 
 # Importar horarios reales desde Bedelía
-python3 manage.py import_schedules
+python3 manage.py import_schedules --replace-semester
 
 # (Opcional) Cargar datos de prueba en vez de scraping
 # python3 manage.py seed_data
@@ -37,20 +37,35 @@ El backend corre en `http://localhost:8000`.
 
 ### Importar horarios
 
-El comando `import_schedules` scrapea los PDFs de la página de Bedelía y carga las materias en la base de datos.
+El comando `import_schedules` scrapea los PDFs de la página de Bedelía y carga las materias en la base de datos. Si no se especifica año/período, detecta el semestre vigente publicado por Bedelía.
 
 ```bash
 # Importar automáticamente desde la página de Bedelía
-python3 manage.py import_schedules
+python3 manage.py import_schedules --replace-semester
 
 # Importar un PDF específico
 python3 manage.py import_schedules --url "https://www.fing.edu.uy/sites/default/files/2026-05/horarios-1er-semestre-2026_1.pdf"
 
 # Especificar año y período
-python3 manage.py import_schedules --year 2026 --period sem1
+python3 manage.py import_schedules --year 2026 --period sem2 --replace-semester
 ```
 
-La página de Bedelía se actualiza cuando cambia el semestre. El comando detecta los PDFs disponibles automáticamente.
+Para producción, usar `sync_schedules`. Este comando revisa los PDFs publicados, calcula un hash y solo reimporta si detecta cambios. Primero parsea los PDFs y recién después reemplaza la base del semestre, para evitar borrar datos si falla la detección.
+
+```bash
+python3 manage.py sync_schedules
+
+# Forzar reimportación aunque el hash sea igual
+python3 manage.py sync_schedules --force
+```
+
+En Render se recomienda crear un Cron Job diario con:
+
+```bash
+python manage.py migrate && python manage.py sync_schedules
+```
+
+La página de Bedelía se actualiza cuando cambia el semestre. `sync_schedules` detecta el semestre vigente y mantiene la base actualizada.
 
 ## Frontend
 

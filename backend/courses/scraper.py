@@ -1,4 +1,6 @@
+import hashlib
 import re
+import unicodedata
 from datetime import time
 
 import fitz
@@ -14,24 +16,68 @@ DAY_MAP = {
     "Lunes": 0,
     "Martes": 1,
     "Miércoles": 2,
+    "Miercoles": 2,
     "Jueves": 3,
     "Viernes": 4,
     "Sábado": 5,
+    "Sabado": 5,
 }
 
 
-def find_pdf_urls():
+def _normalize_text(text):
+    text = unicodedata.normalize("NFKD", text or "")
+    return "".join(ch for ch in text if not unicodedata.combining(ch))
+
+
+def _normalize_token(text):
+    return _normalize_text(text).upper().strip()
+
+
+def fetch_horarios_page():
     resp = requests.get(HORARIOS_PAGE, timeout=30)
     resp.raise_for_status()
-    soup = BeautifulSoup(resp.text, "html.parser")
+    return resp.text
+
+
+def find_pdf_urls():
+    soup = BeautifulSoup(fetch_horarios_page(), "html.parser")
     urls = []
     for a in soup.find_all("a", href=True):
         href = a["href"]
-        if href.endswith(".pdf") and "horario" in href.lower():
+        href_l = href.lower()
+        if ".pdf" in href_l and "horario" in href_l:
             if not href.startswith("http"):
                 href = BASE_URL + href
             urls.append(href)
     return urls
+
+
+def get_current_schedule_info():
+    html = fetch_horarios_page()
+    soup = BeautifulSoup(html, "html.parser")
+    text = _normalize_text(soup.get_text(" "))
+
+    year_match = re.search(r"Horarios\s+y\s+asignacion\s+de\s+salones\s+(20\d{2})", text, re.IGNORECASE)
+    year = int(year_match.group(1)) if year_match else None
+
+    if re.search(r"Segundo\s+Semestre", text, re.IGNORECASE):
+        period = "sem2"
+    elif re.search(r"Primer\s+Semestre", text, re.IGNORECASE):
+        period = "sem1"
+    else:
+        period = None
+
+    urls = []
+    for a in soup.find_all("a", href=True):
+        href = a["href"]
+        href_l = href.lower()
+        if ".pdf" not in href_l or "horario" not in href_l:
+            continue
+        if not href.startswith("http"):
+            href = BASE_URL + href
+        urls.append(href)
+
+    return {"year": year, "period": period, "urls": urls}
 
 
 def download_pdf(url):
@@ -57,8 +103,16 @@ def parse_room(text):
 
 
 GROUP_TYPE_RE = re.compile(
-    r"(PRACTICO|TEORICO|COLABORATIVO)\s+(GRUPO\s*\d+)", re.IGNORECASE
+    r"(PR[AÁ]CTICO|TE[OÓ]RICO|COLABORATIVO|PRACTICO|TEORICO)\s+(GRUPO\s*\d+)", re.IGNORECASE
 )
+
+
+def _normalize_group_number(group_number):
+    group_number = _normalize_token(group_number)
+    group_number = group_number.replace("PRACTICO", "PRACTICO")
+    group_number = group_number.replace("TEORICO", "TEORICO")
+    group_number = re.sub(r"\s+", " ", group_number).strip()
+    return group_number
 
 
 def _find_first_data_row(data):
@@ -75,10 +129,10 @@ def _extract_group_from_cell(cell0):
     for i, line in enumerate(lines):
         m = GROUP_TYPE_RE.search(line)
         if m:
-            group_type = m.group(1).upper()
-            group_num = m.group(2).upper().replace("  ", " ").strip()
-            group_number = f"{group_type} {group_num.split('GRUPO')[-1].strip()}"
+            group_type = _normalize_token(m.group(1))
+            group_num = _normalize_token(m.group(2))
             group_number = f"{group_type} GRUPO {group_num.split('GRUPO')[-1].strip()}"
+            group_number = _normalize_group_number(group_number)
             name_lines = []
             for nl in lines[:i]:
                 nl = nl.strip()
@@ -120,7 +174,7 @@ def parse_pdf(pdf_bytes):
             else:
                 first_group_row = _find_first_data_row(data)
                 if first_group_row and re.match(
-                    r"(PRACTICO|TEORICO|COLABORATIVO)",
+                    r"(PR[AÁ]CTICO|TE[OÓ]RICO|COLABORATIVO|PRACTICO|TEORICO)",
                     first_group_row,
                     re.IGNORECASE,
                 ):
@@ -142,8 +196,8 @@ def _parse_format_engineering(data, courses, current_course_code, current_course
         cell0 = row[0].strip()
 
         if cell0.startswith("Asignatura:"):
-            header = cell0.replace("Asignatura:", "").strip()
-            code_match = re.match(r"(.+?)\s+-\s+(.+)", header)
+            header = " ".join(cell0.replace("Asignatura:", "").split())
+            code_match = re.match(r"(.+?)\s*[-–—]\s*(.+)", header)
             if code_match:
                 current_course_code = code_match.group(1).strip().replace(" ", "-")
                 current_course_name = code_match.group(2).strip()
@@ -159,9 +213,9 @@ def _parse_format_engineering(data, courses, current_course_code, current_course
             continue
 
         if current_course_code and re.match(
-            r"(PRACTICO|TEORICO|COLABORATIVO)", cell0, re.IGNORECASE
+            r"(PR[AÁ]CTICO|TE[OÓ]RICO|COLABORATIVO|PRACTICO|TEORICO)", cell0, re.IGNORECASE
         ):
-            group_key = cell0.strip()
+            group_key = _normalize_group_number(cell0.strip())
             if group_key not in courses[current_course_code]["groups"]:
                 courses[current_course_code]["groups"][group_key] = {
                     "group_number": group_key,
@@ -283,13 +337,13 @@ def _parse_format_talleres_text(text, courses):
         if current_code:
             for gmatch in GROUP_SCHEDULE_RE.finditer(line):
                 gnum, day_name, start_str, end_str = gmatch.groups()
-                g_key = f"GRUPO {gnum}"
+                g_key = _normalize_group_number(f"GRUPO {gnum}")
                 if g_key not in courses[current_code]["groups"]:
                     courses[current_code]["groups"][g_key] = {
                         "group_number": g_key,
                         "meetings": [],
                     }
-                day_name_cap = day_name.capitalize()
+                day_name_cap = _normalize_text(day_name).capitalize()
                 if day_name_cap in DAY_MAP:
                     start_h, start_m = start_str.split(":")
                     end_h, end_m = end_str.split(":")
@@ -323,18 +377,18 @@ def _extract_meetings_from_row(row, group_dict):
         )
 
 
-def save_to_db(courses_data, semester_year, semester_period, source_url=""):
+def save_to_db(courses_data, semester_year, semester_period, source_url="", source_hash=""):
     semester, _ = Semester.objects.get_or_create(
         year=semester_year, period=semester_period
     )
 
     source = None
     if source_url:
-        source, _ = ScheduleSource.objects.get_or_create(
+        source, _ = ScheduleSource.objects.update_or_create(
             semester=semester,
             source_type="pdf",
             file_name=source_url.split("/")[-1],
-            defaults={"notes": f"Scraped from {source_url}"},
+            defaults={"notes": f"Scraped from {source_url}\nsha256={source_hash}" if source_hash else f"Scraped from {source_url}"},
         )
 
     created_courses = 0
@@ -342,13 +396,15 @@ def save_to_db(courses_data, semester_year, semester_period, source_url=""):
     created_meetings = 0
 
     for course_data in courses_data:
-        course, created = Course.objects.get_or_create(
+        course, created = Course.objects.update_or_create(
             code=course_data["code"],
             semester=semester,
             defaults={"name": course_data["name"]},
         )
         if created:
             created_courses += 1
+        else:
+            course.groups.all().delete()
 
         for group_data in course_data["groups"].values():
             group, created = CourseGroup.objects.get_or_create(
@@ -375,3 +431,7 @@ def save_to_db(courses_data, semester_year, semester_period, source_url=""):
         "groups": created_groups,
         "meetings": created_meetings,
     }
+
+
+def pdf_hash(pdf_bytes):
+    return hashlib.sha256(pdf_bytes).hexdigest()

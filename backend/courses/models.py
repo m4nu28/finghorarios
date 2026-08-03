@@ -17,7 +17,7 @@ class Course(models.Model):
     semester = models.ForeignKey(
         Semester, on_delete=models.CASCADE, related_name="courses"
     )
-    code = models.CharField(max_length=10)
+    code = models.CharField(max_length=40)
     name = models.CharField(max_length=200)
     credits = models.PositiveIntegerField(default=0)
 
@@ -30,7 +30,7 @@ class Course(models.Model):
 
 class CourseGroup(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="groups")
-    group_number = models.CharField(max_length=10)
+    group_number = models.CharField(max_length=50)
     quota = models.PositiveIntegerField(default=0)
 
     class Meta:
