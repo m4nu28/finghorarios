@@ -44,6 +44,32 @@ class ScoringTest(TestCase):
         result = calculate_score(meetings, {})
         self.assertGreater(result["gap_minutes"], 0)
 
+    def test_gap_counts_time_between_fixed_block_and_meeting(self):
+        meetings = self._make_meetings([
+            (0, 12, 0, 14, 0),
+        ])
+        busy_blocks = [
+            {"day": 0, "start": time(8, 0), "end": time(10, 0), "fixed": True},
+        ]
+
+        result = calculate_score(meetings, {}, busy_blocks)
+
+        self.assertEqual(result["gap_minutes"], 120)
+        self.assertEqual(result["gap_detail"][0]["start"], "10:00")
+        self.assertEqual(result["gap_detail"][0]["end"], "12:00")
+
+    def test_busy_block_counts_time_until_meeting(self):
+        meetings = self._make_meetings([
+            (0, 12, 0, 14, 0),
+        ])
+        busy_blocks = [
+            {"day": 0, "start": time(8, 0), "end": time(10, 0), "fixed": False},
+        ]
+
+        result = calculate_score(meetings, {}, busy_blocks)
+
+        self.assertEqual(result["gap_minutes"], 120)
+
     def test_no_gaps(self):
         meetings = self._make_meetings([
             (0, 8, 0, 10, 0),

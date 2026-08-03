@@ -127,49 +127,43 @@ _DAY_NAMES = {
 def _calculate_gaps(meetings, active_days, busy_blocks):
     gaps = []
     for day in active_days:
-        day_meetings = sorted(
-            [m for m in meetings if m["day"] == day],
-            key=lambda m: m["start"],
+        day_anchors = [
+            {"start": m["start"], "end": m["end"]}
+            for m in meetings
+            if m["day"] == day
+        ]
+        day_anchors.extend(
+            {"start": b["start"], "end": b["end"]}
+            for b in busy_blocks
+            if b["day"] == day
         )
-        day_blocks = [b for b in busy_blocks if b["day"] == day]
+        day_anchors = _merge_time_blocks(day_anchors)
 
-        for i in range(len(day_meetings) - 1):
-            gap_start = day_meetings[i]["end"]
-            gap_end = day_meetings[i + 1]["start"]
+        for i in range(len(day_anchors) - 1):
+            gap_start = day_anchors[i]["end"]
+            gap_end = day_anchors[i + 1]["start"]
             gap_minutes = _time_diff_minutes(gap_start, gap_end)
             if gap_minutes <= 0:
                 continue
 
-            busy_in_gap = _subtract_busy(gap_start, gap_end, day_blocks)
-            free_minutes = gap_minutes - busy_in_gap
-
-            if free_minutes > 0:
+            if gap_minutes > 0:
                 gaps.append({
                     "day": day,
                     "start": gap_start,
                     "end": gap_end,
-                    "minutes": free_minutes,
+                    "minutes": gap_minutes,
                 })
     return gaps
 
 
-def _subtract_busy(gap_start, gap_end, day_blocks):
-    total_busy = 0
-    for block in day_blocks:
-        b_start = _max_time(gap_start, block["start"])
-        b_end = _min_time(gap_end, block["end"])
-        overlap = _time_diff_minutes(b_start, b_end)
-        if overlap > 0:
-            total_busy += overlap
-    return min(total_busy, _time_diff_minutes(gap_start, gap_end))
-
-
-def _max_time(t1, t2):
-    return t1 if (t1.hour * 60 + t1.minute) >= (t2.hour * 60 + t2.minute) else t2
-
-
-def _min_time(t1, t2):
-    return t1 if (t1.hour * 60 + t1.minute) <= (t2.hour * 60 + t2.minute) else t2
+def _merge_time_blocks(blocks):
+    merged = []
+    for block in sorted(blocks, key=lambda b: b["start"]):
+        if not merged or block["start"] >= merged[-1]["end"]:
+            merged.append({"start": block["start"], "end": block["end"]})
+        elif block["end"] > merged[-1]["end"]:
+            merged[-1]["end"] = block["end"]
+    return merged
 
 
 def _get_bounds(meetings):

@@ -86,5 +86,6 @@ def _parse_busy_blocks(blocks):
             "start": time(int(start_parts[0]), int(start_parts[1])),
             "end": time(int(end_parts[0]), int(end_parts[1])),
             "reason": block.get("reason"),
+            "fixed": block.get("fixed", False),
         })
     return parsed

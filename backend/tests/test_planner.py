@@ -126,6 +126,36 @@ class PlannerGenerateTest(TestCase):
         result = generate(self.courses_data, preferences=prefs)
         self.assertGreater(len(result["solutions"]), 0)
 
+    def test_generate_prefers_less_gap_from_fixed_block(self):
+        courses_data = [
+            {
+                "code": "A",
+                "name": "Materia A",
+                "groups": [
+                    {
+                        "group_number": "TEORICO GRUPO 1",
+                        "meetings": [
+                            {"day": 0, "start": time(10, 0), "end": time(12, 0), "room": ""},
+                        ],
+                    },
+                    {
+                        "group_number": "TEORICO GRUPO 2",
+                        "meetings": [
+                            {"day": 0, "start": time(14, 0), "end": time(16, 0), "room": ""},
+                        ],
+                    },
+                ],
+            }
+        ]
+        busy_blocks = [
+            {"day": 0, "start": time(8, 0), "end": time(9, 0), "fixed": True},
+        ]
+
+        result = generate(courses_data, busy_blocks=busy_blocks)
+
+        self.assertEqual(result["solutions"][0]["groups"][0]["group_number"], "TEORICO GRUPO 1")
+        self.assertEqual(result["solutions"][0]["gap_minutes"], 60)
+
     def test_generate_returns_meetings(self):
         result = generate(self.courses_data)
         for solution in result["solutions"]:

@@ -10,6 +10,7 @@ class BusyBlockSerializer(serializers.Serializer):
     start = serializers.CharField()
     end = serializers.CharField()
     reason = serializers.CharField(required=False, default=None, allow_blank=True, allow_null=True)
+    fixed = serializers.BooleanField(default=False, required=False)
 
     def validate_start(self, value):
         if not TIME_RE.match(value):
